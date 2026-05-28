@@ -1,7 +1,6 @@
 from sqlmodel import create_engine, SQLModel
 from sqlalchemy.ext.asyncio import AsyncEngine
 from src.config import config
-from src.books.models import Book
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.orm import sessionmaker
 
@@ -11,6 +10,12 @@ engine = AsyncEngine(create_engine(
     echo=True
 ))
 
+Session = sessionmaker(
+    bind = engine,
+    class_=AsyncSession,
+    expire_on_commit=False
+)
+
 async def init_db():
     async with engine.begin() as conn:
         #checks if any new model has been created and takes the metadata and creates the tables in our db
@@ -18,12 +23,6 @@ async def init_db():
 
 
 #Dependency Injection
-async def get_sesssion() -> AsyncSession:
-    Session = sessionmaker(
-        bind = engine,
-        class_=AsyncSession,
-        expire_on_commit=False
-    )
-
-    async with Session() as sessison:
-        yield sessison
+async def get_session():
+    async with Session() as session:
+        yield session
