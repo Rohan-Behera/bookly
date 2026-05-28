@@ -1,13 +1,18 @@
 from src.books.book_data import books
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Depends
 from fastapi.exceptions import HTTPException
 from .schemas import Book, BookUpdateModel
 from typing import List
+from src.db.main import get_sesssion
+from sqlmodel.ext.asyncio.session import AsyncSession
+from src.books.service import BookService
+
+
 
 book_router = APIRouter()
 
 @book_router.get('/', response_model=List[Book])
-async def get_all_books():
+async def get_all_books(session : AsyncSession = Depends(get_sesssion)):
     return books
 
 
