@@ -2,6 +2,7 @@ from .models import User
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel import select
 from .schemas import UserCreateModel
+from .utils import generate_password_hash
 
 
 class UserService:
@@ -16,7 +17,13 @@ class UserService:
         return True if user else False
     
     async def create_user(self, user_data: UserCreateModel, session: AsyncSession):
-        user = user_data
+        user = user_data.model_dump()
         new_user = User(
-            **user_data
+            **user
         )
+        new_user.password = generate_password_hash(user['password'])
+
+        session.add(new_user)
+        await session.commit()
+        session.refresh(new_user)
+        return new_user
