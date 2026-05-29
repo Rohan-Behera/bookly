@@ -28,21 +28,21 @@ class BookService:
         return new_book
 
     async def update_book(self, book_uid: int, updated_data: BookCreateModel, session:AsyncSession):
-        book_to_update = self.get_book_id(book_uid, session)
+        book_to_update = await self.get_book_id(book_uid, session)
 
         if book_to_update is not None:
-            update_data_dict = updated_data.model_dump()
+            update_data_dict = updated_data.model_dump(exclude_unset=True) #only updates provided fields
 
             for k, v in update_data_dict.items():
                 setattr(book_to_update, k, v)
             
             await session.commit()
-
+            await session.refresh(book_to_update)
             return book_to_update
         else:
             return None
 
-    async def deelte_book(self, book_uid: int, session:AsyncSession):
+    async def delete_book(self, book_uid: int, session:AsyncSession):
         book_to_delete = self.get_book_id(book_uid, session)
 
         if book_to_delete is not None:
