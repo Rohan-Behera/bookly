@@ -4,11 +4,11 @@ from datetime import datetime
 
 
 class UserCreateModel(BaseModel):
-    username: str = Field(max_length = 8)
-    email: str = Field(max_length = 40)
-    password: str = Field(min_length = 8)
     first_name: str
     last_name: str
+    username: str = Field(max_length = 8)
+    email: str = Field(max_length = 40)
+    password: str = Field(min_length = 8)   
 
 class UserModel(BaseModel):
     uid: uuid.UUID
@@ -20,3 +20,7 @@ class UserModel(BaseModel):
     is_verified: bool 
     created_at: datetime
     updated_at: datetime
+
+class UserLoginModel(BaseModel):
+    email: str = Field(max_length = 40)
+    password: str = Field(min_length = 8)
