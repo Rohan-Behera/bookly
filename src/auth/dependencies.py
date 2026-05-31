@@ -2,10 +2,9 @@ from fastapi import Request, status
 from fastapi.security import HTTPBearer
 from .utils import decode_token
 from fastapi.exceptions import HTTPException
+from src.db.redis import token_in_blocklist
 
 # overwriting the basse HTTPBearer methods to our own methods
-
-
 class JWTBearer(HTTPBearer):
     def __init__(self, auto_error=True):
         super().__init__(auto_error=auto_error)
@@ -20,6 +19,13 @@ class JWTBearer(HTTPBearer):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN, detail="Invalid or token expired")
 
+        if await token_in_blocklist(token_data['jti']):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail={
+                    "error": "This token is Invalid or has been Revoked",
+                    "resolution": "Please get a new token"
+                })
+        
         self.verify_token_data(token_data)
         return token_data
 
