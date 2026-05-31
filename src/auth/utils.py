@@ -16,7 +16,7 @@ def generate_password_hash(password: str)-> str:
 def verify_password(password: str, hash: str) -> bool:
     return password_context.verify(password, hash)
 
-def create_access_tokens(user_data: dict, expiry: timedelta = None, refresh: bool = False):
+def create_access_token(user_data: dict, expiry: timedelta = None, refresh: bool = False):
     payload = {}
 
     payload['user'] = user_data
