@@ -22,7 +22,8 @@ class UserService:
             **user
         )
         new_user.password = generate_password_hash(user['password'])
-
+        new_user.role = "user"
+        
         session.add(new_user)
         await session.commit()
         session.refresh(new_user)
