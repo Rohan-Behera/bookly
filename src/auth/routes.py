@@ -11,6 +11,7 @@ from src.config import Config
 from .dependencies import RefreshTokenBearer, AccessTokenBearer, get_current_user, RoleChecker
 from datetime import datetime
 from src.db.redis import add_jti_to_blocklist
+from src.errors import UserAlreadyExists, UserNotFound, InvalidCredentials, InvalidToken
 
 auth_router = APIRouter()
 user_service = UserService()
@@ -23,7 +24,7 @@ async def create_user_account(user_data : UserCreateModel, session: AsyncSession
     user_exists = await user_service.user_exists(email, session)
 
     if user_exists:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="user with email already exists")
+        raise UserAlreadyExists()
     
     new_user = await user_service.create_user(user_data, session)
     return new_user
@@ -68,7 +69,7 @@ async def login_users(login_data: UserLoginModel, session: AsyncSession = Depend
                 }
             )
         
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid Email or Password")
+        raise InvalidCredentials()
     
 @auth_router.get('/refresh_token')
 async def get_new_access_token(token_details: dict = Depends(RefreshTokenBearer())):
@@ -83,7 +84,7 @@ async def get_new_access_token(token_details: dict = Depends(RefreshTokenBearer(
             }
         )
     
-    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired token")
+    raise InvalidToken()
 
 @auth_router.get('/me', response_model=UserBooksModel)
 async def get_current_user(user = Depends(get_current_user), _: bool = Depends(role_checker)):
