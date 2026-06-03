@@ -52,9 +52,7 @@ def decode_token(token:str) -> dict:
     
 #sending token via url while sending mail
 def create_url__safe_token(data: dict):
-
     token = serializer.dumps(data)
-
     return token
 
 def decode_url_safe_token(token: str):
