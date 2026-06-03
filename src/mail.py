@@ -21,14 +21,12 @@ mail_config = ConnectionConfig(
 
 mail = FastMail(config=mail_config)
 
-#mail.send_message()
-
-def create_message(recipient: list[str], subject:str, body:str):
+def create_message(recipient: list[str], subject:str, body:str, template_body: dict):
     message = MessageSchema(
         recipients=recipient,
         subject=subject,
-        body=body,
-        subtype=MessageType.html
+        template_body=template_body,
+        subtype=MessageType.html,        
     )
 
     return message

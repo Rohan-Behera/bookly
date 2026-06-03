@@ -1,16 +1,31 @@
 from fastapi import Request, status, Depends
 from fastapi.security import HTTPBearer
 from .utils import decode_token
-from fastapi.exceptions import HTTPException
 from src.db.redis import token_in_blocklist
 from src.db.main import get_session
 from sqlmodel.ext.asyncio.session import AsyncSession
 from .service import UserService
+from src.books.service import BookService
+from src.tags.services import TagService
 from typing import List
 from src.db.models import User
-from src.errors import InvalidToken, RefreshTokenRequired, AccessTokenRequired, InsufficientPermission, AccountNotVerified
+from src.errors import (
+    InvalidToken,
+    RefreshTokenRequired,
+    AccessTokenRequired,
+    InsufficientPermission,
+    AccountNotVerified,
+)
 
-user_service = UserService()
+# DI's
+def get_user_service() -> UserService:
+    return UserService()
+
+def get_book_service() -> BookService:
+    return BookService()
+
+def get_tag_service() -> TagService:
+    return TagService()
 
 # overwriting the basse HTTPBearer methods to our own methods
 class JWTBearer(HTTPBearer):
@@ -26,9 +41,9 @@ class JWTBearer(HTTPBearer):
         if not self.token_is_valid(token):
             raise InvalidToken()
 
-        if await token_in_blocklist(token_data['jti']):
+        if await token_in_blocklist(token_data["jti"]):
             raise InvalidToken()
-        
+
         self.verify_token_data(token_data)
         return token_data
 
@@ -36,27 +51,36 @@ class JWTBearer(HTTPBearer):
         token_data = decode_token(token)
 
         return True if token_data else False
-    
+
     def verify_token_data(self, token_data):
         raise NotImplementedError("Please Override this method in child classes")
 
 
 class AccessTokenBearer(JWTBearer):
     def verify_token_data(self, token_data):
-        if token_data and token_data['refresh']:
+        if token_data and token_data["refresh"]:
             raise AccessTokenRequired()
-        
+
+
 class RefreshTokenBearer(JWTBearer):
     def verify_token_data(self, token_data):
-        if token_data and not token_data['refresh']:
+        if token_data and not token_data["refresh"]:
             raise RefreshTokenRequired()
-        
-async def get_current_user(token_details: dict = Depends(AccessTokenBearer()), 
-                     session: AsyncSession = Depends(get_session)):
-    user_email = token_details['user']['email']
+
+
+async def get_current_user(
+    token_details: dict = Depends(AccessTokenBearer()),
+    session: AsyncSession = Depends(get_session),
+    user_service: UserService = Depends(get_user_service),
+):
+    user_email = token_details["user"]["email"]
     user = await user_service.get_user_by_email(user_email, session)
 
     return user
+
+
+def jwt_bearer() -> AccessTokenBearer:
+    return AccessTokenBearer()
 
 class RoleChecker:
     def __init__(self, allowed_roles: List[str]) -> None:

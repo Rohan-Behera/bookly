@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Verify Your Email</title>
+    <style>
+        body { margin: 0; padding: 0; background-color: #f4f4f7; font-family: Arial, sans-serif; }
+        .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .header { background-color: #4F46E5; padding: 32px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 24px; }
+        .body { padding: 32px; color: #333333; }
+        .body p { font-size: 16px; line-height: 1.6; }
+        .btn { display: inline-block; margin: 24px 0; padding: 14px 32px; background-color: #4F46E5; color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: bold; }
+        .footer { padding: 16px 32px; background-color: #f4f4f7; text-align: center; font-size: 12px; color: #888888; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Bookly</h1>
+        </div>
+        <div class="body">
+            <p>Hi there,</p>
+            <p>Thanks for signing up! Please verify your email address by clicking the button below.</p>
+            <a href="{{ link }}" class="btn">Verify Email</a>
+            <p>If the button doesn't work, copy and paste this link into your browser:</p>
+            <p><a href="{{ link }}">{{ link }}</a></p>
+            <p>If you didn't create an account, you can safely ignore this email.</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2026 Bookly. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
