@@ -21,7 +21,7 @@ mail_config = ConnectionConfig(
 
 mail = FastMail(config=mail_config)
 
-def create_message(recipient: list[str], subject:str, body:str, template_body: dict):
+def create_message(recipient: list[str], subject:str, template_body: dict):
     message = MessageSchema(
         recipients=recipient,
         subject=subject,
