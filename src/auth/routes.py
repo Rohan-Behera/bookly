@@ -32,6 +32,7 @@ from datetime import datetime
 from src.db.redis import add_jti_to_blocklist
 from src.errors import UserAlreadyExists, UserNotFound, InvalidCredentials, InvalidToken
 from src.mail import mail, create_message
+from src.celery_task import send_email
 
 # objects
 auth_router = APIRouter()
@@ -57,10 +58,18 @@ async def create_user_account(
     new_user = await user_service.create_user(user_data, session)
     token = create_url__safe_token({"email": email})
     link = f"http://{Config.DOMAIN}/api/V1/auth/verify/{token}"
-    message = create_message(
-        recipient=[email], subject="Verify your email", template_body={"link": link},
-    )
-    await mail.send_message(message=message, template_name="verify_email.html")
+    emails = [email]
+    subject="Verify your email"
+    template_body = {"link": link}
+    template_name="verify_email.html"   
+
+    # Celery task
+    send_email.delay(emails, subject, template_body, template_name)
+
+    # message = create_message(
+    #     recipient=[email], subject="Verify your email", template_body={"link": link},
+    # )
+    # await mail.send_message(message=message, template_name="verify_email.html")
 
     return {
         "message": "Account Created! Check email to verify your account",
@@ -160,9 +169,16 @@ async def get_me(
 @auth_router.post("/send-mail")
 async def send_mail(emails: EmailModel):
     emails = emails.addresses
-    message = create_message(recipient=emails, subject="Welcome", template_body={"title": "Welcome to Bookly", "message": "Thanks for joining us!"},)
+    subject="Welcome"
+    template_body={"title": "Welcome to Bookly", "message": "Thanks for joining us!"}
+    template_name="welcome.html"
+    
+    # Celery task
+    send_email.delay(emails, subject, template_body, template_name)
+    
+    # message = create_message(recipient=emails, subject="Welcome", template_body={"title": "Welcome to Bookly", "message": "Thanks for joining us!"},)
 
-    await mail.send_message(message=message, template_name="welcome.html")
+    # await mail.send_message(message=message, template_name="welcome.html")
 
     return {"Message": "Email sent sucessfully"}
 
@@ -183,10 +199,19 @@ async def password_reset_request(email_data: PasswordRequestModel):
 
     token = create_url__safe_token({"email": email})
     link = f"http://{Config.DOMAIN}/api/V1/auth/password-reset-confirm/{token}"
-    message = create_message(
-        recipient=[email], subject="Reset your Password", template_body={"link": link}
-    )
-    await mail.send_message(message=message, template_name="password_reset.html")
+
+    emails = [email]
+    subject="Reset your Password"
+    template_body={"link": link}
+    template_name="password_reset.html"
+
+    # Celery task
+    send_email.delay(emails, subject, template_body, template_name)
+
+    # message = create_message(
+    #     recipient=[email], subject="Reset your Password", template_body={"link": link}
+    # )
+    # await mail.send_message(message=message, template_name="password_reset.html")
 
     return JSONResponse(
         content={

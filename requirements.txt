@@ -61,27 +61,3 @@ urllib3==2.7.0
 uvicorn==0.48.0
 watchfiles==1.2.0
 websockets==16.0
-
-
-TESTING=True
-DATABASE_URL=postgresql+asyncpg://postgres:Chintu123@localhost:5432/bookly
-JWT_SECRET=5b309e296880d2966b742159e079d539
-JWT_ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRY=3600
-REFRESH_TOKEN_EXPIRY=2
-REDIS_HOST=localhost
-REDIS_PORT=6379
-JTI_EXPIRY=3600
-
-MAIL_USERNAME=rohanbehera3026
-MAIL_PASSWORD=kuli wayr vadc llln #Generate app password in the gmail
-MAIL_PORT=587
-MAIL_SERVER=smtp.gmail.com
-MAIL_FROM=rohanbehera3026@gmail.com
-MAIL_FROM_NAME=Bookly
-MAIL_STARTTLS=True
-MAIL_SSL_TLS=False
-USE_CREDENTIALS=True
-VALIDATE_CERTS=True
-
-DOMAIN=localhost:8000

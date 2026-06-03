@@ -5,12 +5,7 @@ import fakeredis.aioredis as fakeredis
 if Config.TESTING:
     redis_client = fakeredis.FakeRedis()
 else:
-    redis_client = redis.Redis(
-        host=Config.REDIS_HOST,
-        port=Config.REDIS_PORT,
-        db=0,
-        decode_responses=True
-    )
+    redis_client = redis.from_url(Config.REDIS_URL)
 
 # Add to token to black list(JWTid's is used)
 async def add_jti_to_blocklist(jti: str) -> None:
