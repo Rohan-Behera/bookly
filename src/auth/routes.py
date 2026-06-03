@@ -84,6 +84,12 @@ async def verify_user_account(
     user_service: UserService = Depends(get_user_service),
 ):
     token_data = decode_url_safe_token(token)
+    if not token_data:
+        return JSONResponse(
+            content={"Message": "Error occured during verification"},
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+    
     user_email = token_data.get("email")
 
     if user_email:
@@ -225,7 +231,7 @@ async def password_reset_request(email_data: PasswordRequestModel):
 async def password_reset_confirm(token: str):
     token_data = decode_url_safe_token(token)
 
-    if not token_data.get("email"):
+    if not token_data or not token_data.get("email"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired token"
         )
