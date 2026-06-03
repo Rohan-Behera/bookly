@@ -72,10 +72,10 @@ class AccountNotVerified(Exception):
 
 
 #Exception Handler
-def create_exception_handler(status_code: int, message: Any) -> Callable[[Request, Exception], JSONResponse]:
+def create_exception_handler(status_code: int, initial_detail: Any) -> Callable[[Request, Exception], JSONResponse]:
     async def exception_handler(request: Request, exc: BooklyException):
         return JSONResponse(
-            content=message,
+            content=initial_detail,
             status_code=status_code
         )
 

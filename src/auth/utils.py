@@ -4,9 +4,15 @@ import jwt
 from src.config import Config
 import uuid
 import logging
+from itsdangerous import URLSafeTimedSerializer # sending token via url when sending mails for encrypt, takes a string and creates a token
 
 password_context = CryptContext(
     schemes=['bcrypt']
+)
+
+serializer = URLSafeTimedSerializer(
+    secret_key=Config.JWT_SECRET,
+    salt="email-configuration"
 )
 
 def generate_password_hash(password: str)-> str:
@@ -43,3 +49,17 @@ def decode_token(token:str) -> dict:
     except jwt.PyJWTError as e:
         logging.exception(e)
         return None
+    
+#sending token via url while sending mail
+def create_url__safe_token(data: dict):
+
+    token = serializer.dumps(data)
+
+    return token
+
+def decode_url_safe_token(token: str):
+    try:
+        token_data = serializer.loads(token)
+        return token_data
+    except Exception as e:
+        logging.error(str(e))
